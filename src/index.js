@@ -1,14 +1,17 @@
 const { GraphQLServer } = require("graphql-yoga");
+const { prisma } = require("./generated/prisma-client");
 
-let links = [
-  {
-    id: "link-0",
-    description: "Fullstack tutorial for GraphQL",
-    url: "www.howtographql.com"
-  }
-];
+async function main() {
+  const newLink = await prisma.createLink({
+    url: "www.prisma.io",
+    description: "Prisma replaces traditional ORMs"
+  });
+  console.log(`Created new link: ${newLink.url} (ID: ${newLink.id})`);
+  const allLinks = await prisma.links();
+  console.log(allLinks);
+}
+main().catch(e => console.error(e));
 
-let idCount = links.length;
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone.`,
