@@ -15,23 +15,23 @@ main().catch(e => console.error(e));
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone.`,
-    feed: () => links
+    feed: (root, args, context, info) => {
+      return context.prisma.links();
+    }
   },
   Mutation: {
-    post: (parent, args) => {
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url
-      };
-      links.push(link);
-      return link;
+    post: (root, args, context) => {
+      return context.prisma.createLink({
+        url: args.url,
+        description: args.description
+      });
     }
   }
 };
 
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
-  resolvers
+  resolvers,
+  context: { prisma }
 });
 server.start(() => console.log(`http://localhost:4000에서 서버 가동 중`));
